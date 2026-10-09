@@ -53,12 +53,11 @@ def _build_awe_dicts(file, SKIP) -> dict[str]:
         digest = blake2b(''.join(seed).encode(), digest_size=16).hexdigest()
         
         id_digest_map[ahd.findtext("ID")] = digest
-        awes["parent"] = ahd.findtext("AHD_ID") or ahd.findtext("ID")
-        # we don't stricly need the whole dict but I guess its nice to have this
-        # to compare later on        
+        mais_parent_id = ahd.findtext("AHD_ID") or ahd.findtext("ID") # Regular ID is a fallback in edgecases
+        awes["parent"] = mais_parent_id
         ahds[digest] = awes
 
-    # replace IDs by digest 
+    # replace IDs by digest
     for awe in ahds.values():
         awe["parent"] = id_digest_map[awe["parent"]]
 
