@@ -18,9 +18,9 @@ def collect_descendants(ahd: ET.Element) -> list[ET.Element]:
     descendants = []
     ahd_id = ahd.findtext("ID")
     for child in parent_children_map[ahd_id]:
+        descendants.append(child)
         # ensure file assocation elems (<REL>'s) are collected too
         sibling = child.getnext()
-        descendants.append(child)
         if sibling is not None and sibling.tag == "REL":
             descendants.append(sibling)
         descendants += collect_descendants(child)
