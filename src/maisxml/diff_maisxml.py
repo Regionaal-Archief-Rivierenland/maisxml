@@ -63,46 +63,38 @@ def _build_awe_dicts(file, SKIP) -> dict[str]:
 
     return ahds
 
-def diff_mais_xml(old_file: str | Path, new_file: str | Path, skip_extra: set[str] = []):
+def diff_mais_xml(old_file: str | Path, new_file: str | Path, extra_flexvelden_to_ignore: set[str] = []) -> tuple(list, list):
+    """Find the differences between two MAIS XML files.
+
+    Returns two lists of AHDs. First list contains all AHDs not present in
+    `old_file`; the second contains all AHDs not in `new_file`. When comparing
+    AHDs, certain flexvelden and AHD-level values will be ignored because they are
+    liable to change.
+
+    AHDs are represented as key-value dicts (e.g. `{"CODE":
+    "GM0264D001", "ACHTERNAAM": "Pietersen"}` denotes the <CODE> and achternaam
+    flexveld)
+
+    Present or interpreting the return value is currently the job of the caller.
+
+    Args:
+        old_file (str|Path): first MAIS XML file to compare
+        new_file (str|Path): second MAIS XML file to compare
+        extra_flexvelden_to_ignore (Optional[list]): some flexvelden are already ignored by default;
+         use this list to add more 
+
+    Returns:
+          list n. 1: all AHDs not in `old_file`
+          list n. 2: all AHDs not in `new_file`
+    """
     # Yes, even DATECREATED can spontaneously emerge
     SKIP = {"DATEMUTATED", "USERMUTATED", "USERCREATED", "DATECREATED"}
-    SKIP.update(skip_extra)
+    SKIP.update(extra_flexvelden_to_ignore)
     old_file, new_file = Path(old_file), Path(new_file)
-    
+
     with ProcessPoolExecutor() as pool:
         old, new = pool.map(_build_awe_dicts, [old_file, new_file], [SKIP, SKIP])
 
-    if len(old) != len(new):
-        not_in_old = set(new) - set(old)
-        not_in_new = set(old) - set(new)
-        # TODO: no idea how to represent this
-        log.error(f"{old_file.name} contains {len(old)} AETs, but {new_file.name} contains {len(new)}.")
-        if not_in_old:
-            log.error(f"AETs not in {old_file.name}:")
-            for aet in not_in_old:
-                rich.print(aet)
-        if not_in_new:
-            log.error(f"AETs not in {new_file.name}:")
-            for aet in not_in_new:
-                rich.print(aet)
-        log.error("Note that there might be differences *within* AETs, still!")
-    else:
-        for digest1, digest2 in zip(old, new):
-            if digest1 != digest2:
-                awes_old, awes_new = old[digest1], new[digest2]
-                # sort the dicts before diffing
-                awes_old = {key: awes_old[key] for key in sorted(awes_old.keys())}
-                awes_new = {key: awes_new[key] for key in sorted(awes_new.keys())}
-                diff_lines = _compare_eq_any(
-                    awes_new,
-                    awes_old,
-                    lambda s, lexer="": s,
-                    verbose=1,
-                    assertion_text_diff_style="ndiff",
-                )
-                _show_diff(list(diff_lines))
-
-
-
-
-
+    not_in_old = set(new) - set(old)
+    not_in_new = set(old) - set(new)
+    return not_in_old, not_in_new
