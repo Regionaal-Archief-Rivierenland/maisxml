@@ -29,8 +29,11 @@ def _show_diff(lines: list[str], context: int = 1) -> None:
         line = line.replace("Right contains", "Left contains")
         console.print(Text(line, style=STYLES.get(line[:1], "")))
 
-def _strip_spaces_but_not_newlines(s: str):
-    return re.sub(r" +\n", "\n", s).strip(" ")
+# maybe make this public?
+def _mais_strip(s: str):
+    s = re.sub(r" +\n", "\n", s)
+    s = re.sub(r"\n+", "\n", s)
+    return s.strip(" ")
 
 def _build_awe_dicts(file, SKIP) -> dict[str]:
     """Returns AWEs as key-value pairs, indexed by a digest"""
@@ -38,7 +41,7 @@ def _build_awe_dicts(file, SKIP) -> dict[str]:
     id_digest_map, ahds = {}, {}
     for ahd in root.iterfind("AHD"):
         awes = {
-            naam: _strip_spaces_but_not_newlines(awe.findtext("WAARDE"))
+            naam: _mais_strip(awe.findtext("WAARDE"))
             for awe in ahd.iterfind("AWE")
             if (naam := awe.findtext("NAAM")) not in SKIP
         }
