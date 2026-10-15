@@ -64,7 +64,11 @@ def _build_awe_dicts(file, SKIP) -> dict[str]:
 
     return ahds
 
-def diff_maisxml(old_file: str | Path, new_file: str | Path, extra_flexvelden_to_ignore: set(str) = []) -> tuple(list, list):
+def diff_maisxml(
+    old_file: str | Path,
+    new_file: str | Path,
+    extra_flexvelden_to_ignore: set[str] = [],
+) -> tuple[list, list]:
     """Find the differences between two MAIS XML files.
 
     Returns two lists of AHDs. First list contains all AHDs not present in
