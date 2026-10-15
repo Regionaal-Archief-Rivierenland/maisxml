@@ -72,10 +72,23 @@ def diff_mais_xml(old_file: str | Path, new_file: str | Path, extra_flexvelden_t
     liable to change.
 
     AHDs are represented as key-value dicts (e.g. `{"CODE":
-    "GM0264D001", "ACHTERNAAM": "Pietersen"}` denotes the <CODE> and achternaam
+    "GM0264D001", "ACHTERNAAM": "Pietersen"}` denotes the `<CODE>` and achternaam
     flexveld)
 
     Present or interpreting the return value is currently the job of the caller.
+
+    Example:
+       ```python
+       import maisxml
+
+       # get AHDs that are not in the old MAIS XML file, and the AHDs that are not
+       # in the new MAIS XML file
+       not_in_old, not_in_new = maisxml.diff_maisxml("1854.txt.old", "1854.txt.new")
+
+       if len(not_in_old) != len(not_in_new):
+           # bad news, probably
+           print(f"De twee toegangen bevatten een verschillend aantal AHDs")
+       ```
 
     Args:
         old_file (str|Path): first MAIS XML file to compare
@@ -84,8 +97,8 @@ def diff_mais_xml(old_file: str | Path, new_file: str | Path, extra_flexvelden_t
          use this list to add more 
 
     Returns:
-          list n. 1: all AHDs not in `old_file`
-          list n. 2: all AHDs not in `new_file`
+        lists: two lists; first contains all AHDs not in `old_file`, second all
+         AHDs not in `new_file`
     """
     # Yes, even DATECREATED can spontaneously emerge
     SKIP = {"DATEMUTATED", "USERMUTATED", "USERCREATED", "DATECREATED"}
