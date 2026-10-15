@@ -5,14 +5,15 @@ from pathlib import Path
 from collections import OrderedDict
 from hashlib import blake2b
 from concurrent.futures import ProcessPoolExecutor
-from _pytest.assertion.util import _compare_eq_any
-import rich
-from rich.console import Console
-from rich.text import Text
 
 log = logging.getLogger(__name__)
 
 def _show_diff(lines: list[str], context: int = 1) -> None:
+    from _pytest.assertion.util import _compare_eq_any
+    import rich
+    from rich.console import Console
+    from rich.text import Text
+
     STYLES = {"-": "red", "+": "green", "?": "yellow"}
     changed = [i for i, l in enumerate(lines) if l[:1] in STYLES]
     keep = {j for i in changed for j in range(i - context, i + context + 1)}
