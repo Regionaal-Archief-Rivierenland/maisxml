@@ -3,8 +3,9 @@
 import lxml.etree as ET
 from collections import defaultdict
 import maisxml
+import sys
 
-root = ET.parse("9993_1_102_flexis.txt")
+root = ET.parse("1852_1_102_flexis.txt")
 
 # precompute a map that holds direct descendants of a given AHD, indexed by ID
 # precompute a map between IDs and elems
@@ -18,14 +19,19 @@ def collect_descendants(ahd: ET.Element) -> list[ET.Element]:
     ahd_id = ahd.findtext("ID")
     for child in parent_children_map[ahd_id]:
         descendants.append(child)
+        # ensure file assocation elems (<REL>'s) are collected too
+        sibling = child.getnext()
+        if sibling is not None and sibling.tag == "REL":
+            descendants.append(sibling)
         descendants += collect_descendants(child)
     return descendants
 
 top_id = root.findtext("AHD/ID")
 # little preamble (e.g. zaaktypeinventaris and inleiding)
 preamble = root.findall(f"AHD[AHD_ID='{top_id}']")
-zaaktypeinventaris = preamble[-1]
+zaaktypeinventaris = preamble[0]
 # AHDS directly under zaaktypeinventaris
+# TODO: Sometimes we want to split on series, but sometimes we want to splits on dossiers?
 series = root.findall(f"AHD[AHD_ID='{zaaktypeinventaris.findtext("ID")}']")
 
 # "seed" branches
