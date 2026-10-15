@@ -49,3 +49,28 @@ def copy_header(root_src: ET.Element | ET.ElementTree, root_dst: ET.Element | ET
       inrichting_end = root_dst.index(root_dst.find("INRICHTING")) + 1
       body = root_dst[inrichting_end:]
       root_dst = header + body
+
+def write_maisxml(root: ET.Element, outfile: str | Path):
+    """Schrijf `root` weg als MAIS XML.
+
+    Hier is een speciale routine voor nodig omdat MAIS XML pseudo-XML is, en
+    daarom aan andere regels voldoet.
+
+    Example:
+        ```python
+        root = ET.parse(xmlfile).getroot()
+
+        # modify root
+        # ...
+
+        # save new tree
+        maisxml.write_maisxml(root)
+        ```
+    """
+    xml_string = ET.tostring(root, encoding="utf-8").decode("utf-8")
+    xml_string = xml_string.strip()
+    xml_string = xml_string.removesuffix("</MFEXPORT>")
+    xml_string = xml_string.replace("&lt;", "<").replace("&gt;", ">").replace("&amp;", "&")
+
+    with open(outfile, "w", newline="\r\n") as f:
+        f.write(xml_string)
