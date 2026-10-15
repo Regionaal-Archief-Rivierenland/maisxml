@@ -3,7 +3,7 @@ import subprocess
 from pathlib import Path
 
 def new_awe(veldnaam: str, veldprompt: str, veldwaarde: str) -> ET.Element:
-      """Create a new <AWE>."""
+      """Create a new `<AWE>`."""
       awe = ET.Element("AWE")
       naam = ET.SubElement(awe, "NAAM")
       prompt = ET.SubElement(awe, "PROMPT")
@@ -26,7 +26,7 @@ def is_fixed(file: Path | str) -> bool:
 
 def get_header(root: ET.Element | ET.ElementTree) -> list[ET.Element]:
       """Return the MAIS XML header (i.e. everything until the closing
-      </INRICHTING>, including the top AHD)"""
+      `</INRICHTING>`, including the top AHD)"""
       if isinstance(root, ET.ElementTree):
             root = root.getroot()
 
@@ -36,7 +36,7 @@ def get_header(root: ET.Element | ET.ElementTree) -> list[ET.Element]:
 def copy_header(root_src: ET.Element | ET.ElementTree, root_dst: ET.Element | ET.ElementTree):
       """Copy MAIS XML header from `root_src` to `root_dst`.
 
-      Header here includes everything until the closing </INRICHTING>, including
+      Header here includes everything until the closing `</INRICHTING>`, including
       the top AHD. Modifies `root_dst` inplace.
       """
       if isinstance(root_src, ET.ElementTree):
