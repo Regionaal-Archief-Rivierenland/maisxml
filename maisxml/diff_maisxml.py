@@ -113,6 +113,6 @@ def diff_maisxml(
     with ProcessPoolExecutor() as pool:
         old, new = pool.map(_build_awe_dicts, [old_file, new_file], [SKIP, SKIP])
 
-    not_in_old = set(new) - set(old)
-    not_in_new = set(old) - set(new)
-    return not_in_old, not_in_new
+    not_in_old_idxs = set(new) - set(old)
+    not_in_new_idxs = set(old) - set(new)
+    return [new[idx] for idx in not_in_old_idxs], [old[idx] for idx in not_in_new_idxs]
