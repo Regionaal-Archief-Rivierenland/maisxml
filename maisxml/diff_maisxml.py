@@ -61,6 +61,8 @@ def _build_awe_dicts(file, SKIP) -> dict[str]:
     # replace IDs by digest
     for awe in ahds.values():
         awe["parent"] = id_digest_map[awe["parent"]]
+        if code := ahds[awe["parent"]].get("CODE"):            
+            awe["parent_CODE"] = code
 
     return ahds
 
