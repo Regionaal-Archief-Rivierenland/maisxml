@@ -34,7 +34,7 @@ def _show_diff(lines: list[str], context: int = 1) -> None:
 def _mais_strip(s: str):
     s = re.sub(r" +\n", "\n", s)
     s = re.sub(r"\n+", "\n", s)
-    return s.rstrip()
+    return s.strip()
 
 def _build_awe_dicts(file, SKIP) -> dict[str]:
     """Returns AWEs as key-value pairs, indexed by a digest"""
