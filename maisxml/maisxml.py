@@ -1,6 +1,12 @@
 from lxml import etree as ET
 import subprocess
 from pathlib import Path
+from uuid import uuid4
+from datetime import datetime
+
+def _datum_gronings() -> str:
+      """Huidig datum, op z'n Gronings geformateerd"""
+      return datetime.now().strftime("%d-%m-%Y %H-%M %S")
 
 def new_awe(veldnaam: str, veldprompt: str, veldwaarde: str) -> ET.Element:
       """Create a new `<AWE>`."""
@@ -14,6 +20,43 @@ def new_awe(veldnaam: str, veldprompt: str, veldwaarde: str) -> ET.Element:
       prompt.text, prompt.tail = veldprompt, "\n"
       waarde.text, waarde.tail = veldwaarde, "\n"
       return awe
+
+def new_ahd(
+    AET: str,
+    top_id: str,
+    parent_id: str,
+    CODE: Optional[str] = None,
+    by_user: Optional[str] = "RAR_ARA",
+) -> ET.Element:
+    ahd = ET.Element("AHD")
+    ET.SubElement(ahd, "ID").text = str(uuid4().int)
+    ET.SubElement(ahd, "AET").text = AET
+    ET.SubElement(ahd, "AHD_ID").text = parent_id
+    ET.SubElement(ahd, "ADT_ID").text = "102"  # FIXME: this our organisation ID
+    ET.SubElement(ahd, "ADT_ID_TOP").text = top_id
+    ET.SubElement(ahd, "GUID").text = uuid4().hex.upper()
+    if CODE:
+        ET.SubElement(ahd, "CODE").text = "CODE"
+    # TODO: do we need more?
+    # voorlopig_volgnummer = ET.SubElement(ahd, "VOORLOPIG_NUMMER").text = 0
+    # volgnummer = ET.SubElement(ahd, "VOLGNUMMER").text = 0
+
+    ahd.text, ahd.tail = "\n", "\n"
+    for child in ahd:
+          child.tail = "\n"
+
+    # these have the correct tail already
+    date = _datum_gronings()
+    ahd.extend(
+        (
+            new_awe("USERMUTATED", "Gewijzigd door", by_user),
+            new_awe("USERCREATED", "Gemaakt door", by_user),
+            new_awe("DATEMUTATED", "Gewijzigd op", date),
+            new_awe("DATECREATED", "Gemaakt op", date),
+        )
+    )
+
+    return ahd
 
 def is_fixed(file: Path | str) -> bool:
       """Check if `fixmaisxml` has been run on `file`."""
