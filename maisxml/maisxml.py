@@ -33,7 +33,7 @@ def new_ahd(
     ET.SubElement(ahd, "AET").text = AET
     ET.SubElement(ahd, "AHD_ID").text = parent_id
     ET.SubElement(ahd, "ADT_ID").text = "102"  # FIXME: this our organisation ID
-    ET.SubElement(ahd, "ADT_ID_TOP").text = top_id
+    ET.SubElement(ahd, "AHD_ID_TOP").text = top_id
     ET.SubElement(ahd, "GUID").text = uuid4().hex.upper()
     if CODE:
         ET.SubElement(ahd, "CODE").text = "CODE"
