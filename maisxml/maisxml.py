@@ -58,7 +58,7 @@ def new_ahd(
 
     return ahd
 
-def is_fixed(file: Path | str) -> bool:
+def maisxml_has_been_fixed(file: Path | str) -> bool:
       """Check if `fixmaisxml` has been run on `file`."""
       # re-implementing `tail` in python is _truly_ annoying, but we need
       # something like it when dealing with big files, so just shell out
