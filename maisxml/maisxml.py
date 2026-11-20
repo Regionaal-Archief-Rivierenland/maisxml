@@ -67,6 +67,14 @@ def is_fixed(file: Path | str) -> bool:
             return True
       return False
 
+# TODO: make a proper python wrapper/fast re-implementation
+def defix(file: Path | str) -> bool:
+    """Undo the result of `fixmaisxml`."""
+    result = subprocess.run(["fixmaisxml", "-d", file], capture_output=True, text=True)
+    if result.stderr:
+        raise Exception("`fixmaisxml -d` failed with:\n" + result.stderr)
+
+
 def get_header(root: ET.Element | ET.ElementTree) -> list[ET.Element]:
       """Return the MAIS XML header (i.e. everything until the closing
       `</INRICHTING>`, including the top AHD)"""
