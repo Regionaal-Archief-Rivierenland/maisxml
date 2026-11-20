@@ -75,5 +75,5 @@ root.text = "\n"
 for idx, bucket in enumerate([bucket_1, bucket_2], 1):
     root[:] = header + preamble + bucket
     nieuwe_toegangscode = f"{toegang}-{idx}"
-    root.find("CODE").text = nieuwe_toegangscode
-    maisxml.write_maisxml(root, xmlfile.parent / f"{nieuwe_toegangscode}.txt")
+    root.find("AHD/CODE").text = nieuwe_toegangscode
+    maisxml.write_maisxml(root, xmlfile.parent / f"{nieuwe_toegangscode}_1_102_flexis.txt")
