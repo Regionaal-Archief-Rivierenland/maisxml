@@ -4,8 +4,15 @@ import lxml.etree as ET
 from collections import defaultdict
 import maisxml
 import sys
+from pathlib import Path
+import re
 
-root = ET.parse("1852_1_102_flexis.txt")
+xmlfile = Path(sys.argv[1])
+# xmlfile = Path("/tmp/1842_1_102_flexis.txt")
+# TODO: make this a param the records the depth in the tree we want to split at
+depth = 2 # 2 means: split at serie level, 3 is at dossier, etc.
+root = ET.parse(xmlfile)
+toegang = root.findtext("AHD/CODE")
 
 # precompute a map that holds direct descendants of a given AHD, indexed by ID
 # precompute a map between IDs and elems
@@ -26,16 +33,25 @@ def collect_descendants(ahd: ET.Element) -> list[ET.Element]:
         descendants += collect_descendants(child)
     return descendants
 
-top_id = root.findtext("AHD/ID")
-# little preamble (e.g. zaaktypeinventaris and inleiding)
-preamble = root.findall(f"AHD[AHD_ID='{top_id}']")
-zaaktypeinventaris = preamble[0]
-# AHDS directly under zaaktypeinventaris
-# TODO: Sometimes we want to split on series, but sometimes we want to splits on dossiers?
-series = root.findall(f"AHD[AHD_ID='{zaaktypeinventaris.findtext("ID")}']")
+parent_id = root.findtext("AHD/ID") # id of the top
+# preamble (e.g. zaaktypeinventaris and inleiding), 
+# or: AETs shared by all newly splitted toegangen
+preamble = []
 
-# "seed" branches
-branches = [[serie] for serie in series]
+for i in range(depth):
+    # all AETs at the current depth
+    horizontal_slice = parent_children_map[parent_id]
+    # FIXME: this assumption is weird/often incorrect
+    # assume the last node at our current depth holds the rest of the tree?
+    parent_id = horizontal_slice[-1].findtext("ID")
+
+    if i < (depth - 1):
+        preamble.extend(horizontal_slice)
+        
+
+# AHDS directly under zaaktypeinventaris
+# "seed" branches (i.e. collect starting points)
+branches = [[AET] for AET in horizontal_slice]
 # collect all descendants
 for b in branches:
     b += collect_descendants(b[0])
@@ -58,4 +74,6 @@ root = ET.Element("MFEXPORT", attrib={"VERSION": "48.0", "ENCODING": "UTF-8"})
 root.text = "\n"
 for idx, bucket in enumerate([bucket_1, bucket_2], 1):
     root[:] = header + preamble + bucket
-    maisxml.write_maisxml(root, f"t{idx}.txt")
+    nieuwe_toegangscode = f"{toegang}-{idx}"
+    root.find("AHD/CODE").text = nieuwe_toegangscode
+    maisxml.write_maisxml(root, xmlfile.parent / f"{nieuwe_toegangscode}_1_102_flexis.txt")
