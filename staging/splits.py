@@ -11,14 +11,9 @@ xmlfile = Path(sys.argv[1])
 # xmlfile = Path("/tmp/1842_1_102_flexis.txt")
 # TODO: make this a param the records the depth in the tree we want to split at
 depth = 2 # 2 means: split at serie level, 3 is at dossier, etc.
-toegang = re.match(r"(.+?)[_\.]", xmlfile.name)
-
-if toegang:
-    toegang = toegang.group(1)
-else:
-    toegang = "t" # placeholder
-
 root = ET.parse(xmlfile)
+toegang = root.findtext("AHD/CODE")
+
 # precompute a map that holds direct descendants of a given AHD, indexed by ID
 # precompute a map between IDs and elems
 parent_children_map = defaultdict(list)
