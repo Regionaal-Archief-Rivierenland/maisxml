@@ -4,22 +4,25 @@ from pathlib import Path
 from uuid import uuid4
 from datetime import datetime
 
+
 def _datum_gronings() -> str:
-      """Huidig datum, op z'n Gronings geformateerd"""
-      return datetime.now().strftime("%d-%m-%Y %H-%M %S")
+    """Huidig datum, op z'n Gronings geformateerd"""
+    return datetime.now().strftime("%d-%m-%Y %H-%M %S")
+
 
 def new_awe(veldnaam: str, veldprompt: str, veldwaarde: str) -> ET.Element:
-      """Create a new `<AWE>`."""
-      awe = ET.Element("AWE")
-      naam = ET.SubElement(awe, "NAAM")
-      prompt = ET.SubElement(awe, "PROMPT")
-      waarde = ET.SubElement(awe, "WAARDE")
-  
-      awe.text, awe.tail = "\n", "\n" # we \r\n this later
-      naam.text, naam.tail = veldnaam, "\n"
-      prompt.text, prompt.tail = veldprompt, "\n"
-      waarde.text, waarde.tail = veldwaarde, "\n"
-      return awe
+    """Create a new `<AWE>`."""
+    awe = ET.Element("AWE")
+    naam = ET.SubElement(awe, "NAAM")
+    prompt = ET.SubElement(awe, "PROMPT")
+    waarde = ET.SubElement(awe, "WAARDE")
+
+    awe.text, awe.tail = "\n", "\n"  # we \r\n this later
+    naam.text, naam.tail = veldnaam, "\n"
+    prompt.text, prompt.tail = veldprompt, "\n"
+    waarde.text, waarde.tail = veldwaarde, "\n"
+    return awe
+
 
 def new_ahd(
     AET: str,
@@ -43,7 +46,7 @@ def new_ahd(
 
     ahd.text, ahd.tail = "\n", "\n"
     for child in ahd:
-          child.tail = "\n"
+        child.tail = "\n"
 
     # these have the correct tail already
     date = _datum_gronings()
@@ -58,14 +61,20 @@ def new_ahd(
 
     return ahd
 
+def extract_toegangscode(file: Path | str) -> str:
+    # i.e. "only read AHDs, and return the first one after the end-event"
+    _, top_ahd = next(ET.iterparse(file, tag="AHD"))
+    return top_ahd.findtext("CODE")
+
 def maisxml_has_been_fixed(file: Path | str) -> bool:
-      """Check if `fixmaisxml` has been run on `file`."""
-      # re-implementing `tail` in python is _truly_ annoying, but we need
-      # something like it when dealing with big files, so just shell out
-      tail = subprocess.check_output(["tail", file], text=True)
-      if "</MFEXPORT>" in tail:
-            return True
-      return False
+    """Check if `fixmaisxml` has been run on `file`."""
+    # re-implementing `tail` in python is _truly_ annoying, but we need
+    # something like it when dealing with big files, so just shell out
+    tail = subprocess.check_output(["tail", file], text=True)
+    if "</MFEXPORT>" in tail:
+        return True
+    return False
+
 
 # TODO: make a proper python wrapper/fast re-implementation
 def defix(file: Path | str) -> bool:
@@ -76,30 +85,33 @@ def defix(file: Path | str) -> bool:
 
 
 def get_header(root: ET.Element | ET.ElementTree) -> list[ET.Element]:
-      """Return the MAIS XML header (i.e. everything until the closing
-      `</INRICHTING>`, including the top AHD)"""
-      if isinstance(root, ET.ElementTree):
-            root = root.getroot()
+    """Return the MAIS XML header (i.e. everything until the closing
+    `</INRICHTING>`, including the top AHD)"""
+    if isinstance(root, ET.ElementTree):
+        root = root.getroot()
 
-      return root[:root.index(root.find("INRICHTING")) + 1]
+    return root[: root.index(root.find("INRICHTING")) + 1]
+
 
 # TODO: maybe rename to something like copy_inrichting?
-def copy_header(root_src: ET.Element | ET.ElementTree, root_dst: ET.Element | ET.ElementTree):
-      """Copy MAIS XML header from `root_src` to `root_dst`.
+def copy_header(
+    root_src: ET.Element | ET.ElementTree, root_dst: ET.Element | ET.ElementTree
+):
+    """Copy MAIS XML header from `root_src` to `root_dst`.
 
-      Header here includes everything until the closing `</INRICHTING>`, including
-      the top AHD. Modifies `root_dst` inplace.
-      """
-      if isinstance(root_src, ET.ElementTree):
-            root_src = root_src.getroot()
+    Header here includes everything until the closing `</INRICHTING>`, including
+    the top AHD. Modifies `root_dst` inplace.
+    """
+    if isinstance(root_src, ET.ElementTree):
+        root_src = root_src.getroot()
 
-      if isinstance(root_dst, ET.ElementTree):
-            root_dst = root_dst.getroot()
+    if isinstance(root_dst, ET.ElementTree):
+        root_dst = root_dst.getroot()
 
-      header = get_header(root_src)
-      inrichting_end = root_dst.index(root_dst.find("INRICHTING")) + 1
-      body = root_dst[inrichting_end:]
-      root_dst = header + body
+    header = get_header(root_src)
+    inrichting_end = root_dst.index(root_dst.find("INRICHTING")) + 1
+    body = root_dst[inrichting_end:]
+    root_dst = header + body
 
 def write_maisxml(root: ET.Element, outfile: str | Path):
     """Schrijf `root` weg als MAIS XML.
