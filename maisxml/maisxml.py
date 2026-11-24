@@ -7,7 +7,7 @@ from datetime import datetime
 
 def datum_gronings() -> str:
     """Huidig datum, op z'n Gronings geformateerd"""
-    return datetime.now().strftime("%d-%m-%Y %H-%M %S")
+    return datetime.now().strftime("%d-%m-%Y %H:%M %S")
 
 
 def new_awe(naam: str, prompt: str, waarde: str) -> ET.Element:
