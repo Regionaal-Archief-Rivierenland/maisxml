@@ -37,6 +37,15 @@ def new_ahd(
     CODE: Optional[str] = None,
     by_user: Optional[str] = "RAR_ARA",
 ) -> ET.Element:
+    """Maak een nieuwe AHD aan.
+
+    Args:
+        - AET: welke AET het is (i.e. soort van de AHD)
+        - top_id: ID van de bijbehorende top
+        - parent_id: Waarde van `<AHD_ID>` (i.e. het ID van de ouder van de aangemaakte AHD).
+         Kan hetzelfde zijn als `top_id`.
+        - CODE (optional): Eventuele waarde voor in `<CODE>` 
+    """
     ahd = ET.Element("AHD")
     ET.SubElement(ahd, "ID").text = str(uuid4().int)
     ET.SubElement(ahd, "AET").text = AET
