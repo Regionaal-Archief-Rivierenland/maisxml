@@ -87,7 +87,7 @@ def update_or_add_awe(ahd: ET.Element, naam: str, prompt: str, waarde: str):
         - waarde: de waarde om in het flexveld te vullen
 
     """
-    if (awe := ahd.find(f"AWE[NAAM={naam}]")) is None:
+    if (awe := ahd.find(f"AWE[NAAM='{naam}']")) is None:
         ahd.append(new_awe(naam, prompt, waarde))
     else:
         awe.find("WAARDE").text = waarde
