@@ -77,32 +77,35 @@ def new_ahd(
     return ahd
 
 
-def update_or_add_awe(ahd: ET.Element, naam: str, prompt: str, waarde: str):
-    """Voeg een nieuwe AWE toe aan de AHD in `ahd`, *of* update de waarde van de
-    huidige AWE als de AWE al bestaat.
-
-    Update ook DATEMUTATED in `ahd`.
-    
-    Args:
-        - ahd: De AHD om het flexveld aan toe te voegen
-        - naam: de naam van het flexveld/de waarde van `<NAAM>`
-        - prompt: de prompt van het flexveld
-        - waarde: de waarde om in het flexveld te vullen
-
-    """
+# Private shared helper (avoids circular dep between update_or_add_awe and touch_datemutated)
+def _update_or_add_awe(ahd: ET.Element, naam: str, prompt: str, waarde: str):
     if (awe := ahd.find(f"AWE[NAAM='{naam}']")) is None:
         ahd.append(new_awe(naam, prompt, waarde))
     else:
         awe.find("WAARDE").text = waarde
 
+def update_or_add_awe(ahd: ET.Element, naam: str, prompt: str, waarde: str):
+    """Voeg een nieuwe AWE toe aan de AHD in `ahd`, *of* update de waarde van de
+    huidige AWE als de AWE al bestaat.
+
+    Update ook DATEMUTATED in `ahd`.
+
+    Args:
+        - ahd: De AHD om het flexveld aan toe te voegen
+        - naam: de naam van het flexveld/de waarde van `<NAAM>`
+        - prompt: de prompt van het flexveld
+        - waarde: de waarde om in het flexveld te vullen
+    """
+    _update_or_add_awe(ahd, naam, prompt, waarde)
     touch_datemutated(ahd)
 
 
 def touch_datemutated(ahd: ET.Element, by_user: str = "RAR_ARA"):
     """Update `DATEMUTATED` en `USERMUTATED`. Deze AWEs worden aangemaakt als ze nog
     niet bestaan."""
-    update_or_add_awe(ahd, "USERMUTATED", "Gewijzigd door", by_user)
-    update_or_add_awe(ahd, "DATEMUTATED", "Gewijzigd op", datum_gronings())
+    _update_or_add_awe(ahd, "USERMUTATED", "Gewijzigd door", by_user)
+    _update_or_add_awe(ahd, "DATEMUTATED", "Gewijzigd op", datum_gronings())
+
 
 def extract_toegangscode(file: Path | str) -> str:
     # ignore everything but AHDs, and yield the first one after its been parsed
