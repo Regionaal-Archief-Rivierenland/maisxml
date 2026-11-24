@@ -5,7 +5,7 @@ from uuid import uuid4
 from datetime import datetime
 
 
-def _datum_gronings() -> str:
+def datum_gronings() -> str:
     """Huidig datum, op z'n Gronings geformateerd"""
     return datetime.now().strftime("%d-%m-%Y %H-%M %S")
 
@@ -64,7 +64,7 @@ def new_ahd(
         child.tail = "\n"
 
     # these have the correct tail already
-    date = _datum_gronings()
+    date = datum_gronings()
     ahd.extend(
         (
             new_awe("USERMUTATED", "Gewijzigd door", by_user),
@@ -99,12 +99,13 @@ def touch_datemutated(ahd: ET.Element, by_user: str = "RAR_ARA"):
     """Update `DATEMUTATED` en `USERMUTATED`. Deze AWEs worden aangemaakt als ze nog
     niet bestaan."""
     update_or_add_awe(ahd, "USERMUTATED", "Gewijzigd door", by_user)
-    update_or_add_awe(ahd, "DATEMUTATED", "Gewijzigd op", _datum_gronings())
+    update_or_add_awe(ahd, "DATEMUTATED", "Gewijzigd op", datum_gronings())
 
 def extract_toegangscode(file: Path | str) -> str:
     # ignore everything but AHDs, and yield the first one after its been parsed
     _, top_ahd = next(ET.iterparse(file, tag="AHD"))
     return top_ahd.findtext("CODE")
+
 
 def maisxml_has_been_fixed(file: Path | str) -> bool:
     """Check if `fixmaisxml` has been run on `file`."""
