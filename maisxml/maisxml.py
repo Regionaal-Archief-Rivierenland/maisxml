@@ -146,7 +146,7 @@ def write_maisxml(root: ET.Element, outfile: str | Path):
         # ...
 
         # save new tree
-        maisxml.write_maisxml(root)
+        maisxml.write_maisxml(root, "/path/to/output.txt")
         ```
     """
     xml_string = ET.tostring(root, encoding="utf-8").decode("utf-8")
