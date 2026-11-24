@@ -19,14 +19,14 @@ def new_awe(naam: str, prompt: str, waarde: str) -> ET.Element:
         - waarde: de waarde om in het flexveld te vullen
     """
     awe = ET.Element("AWE")
-    naam = ET.SubElement(awe, "NAAM")
-    prompt = ET.SubElement(awe, "PROMPT")
-    waarde = ET.SubElement(awe, "WAARDE")
+    awe_naam = ET.SubElement(awe, "NAAM")
+    awe_prompt = ET.SubElement(awe, "PROMPT")
+    awe_waarde = ET.SubElement(awe, "WAARDE")
 
     awe.text, awe.tail = "\n", "\n"
-    naam.text, naam.tail = naam, "\n"
-    prompt.text, prompt.tail = prompt, "\n"
-    waarde.text, waarde.tail = waarde, "\n"
+    awe_naam.text, awe_naam.tail = naam, "\n"
+    awe_prompt.text, awe_prompt.tail = prompt, "\n"
+    awe_waarde.text, awe_waarde.tail = waarde, "\n"
     return awe
 
 
