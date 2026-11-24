@@ -154,5 +154,6 @@ def write_maisxml(root: ET.Element, outfile: str | Path):
     xml_string = xml_string.removesuffix("</MFEXPORT>")
     xml_string = xml_string.replace("&lt;", "<").replace("&gt;", ">").replace("&amp;", "&")
 
-    with open(outfile, "w", newline="\r\n") as f:
+    # MAIS outputs DOS line endings but handles unix endings fine
+    with open(outfile, "w") as f:
         f.write(xml_string)
