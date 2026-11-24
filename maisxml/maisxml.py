@@ -134,6 +134,10 @@ def write_maisxml(root: ET.Element, outfile: str | Path):
     Hier is een speciale routine voor nodig omdat MAIS XML pseudo-XML is, en
     daarom aan andere regels voldoet.
 
+    Args:
+        - root (ET.Element): root-element om weg te schrijven
+        - outfile (str | Path): pad naar het MAIS XML output-bestand
+
     Example:
         ```python
         root = ET.parse(xmlfile).getroot()
