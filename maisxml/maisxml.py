@@ -76,10 +76,13 @@ def new_ahd(
 
     return ahd
 
+
 def update_or_add_awe(ahd: ET.Element, naam: str, prompt: str, waarde: str):
     """Voeg een nieuwe AWE toe aan de AHD in `ahd`, *of* update de waarde van de
     huidige AWE als de AWE al bestaat.
 
+    Update ook DATEMUTATED in `ahd`.
+    
     Args:
         - ahd: De AHD om het flexveld aan toe te voegen
         - naam: de naam van het flexveld/de waarde van `<NAAM>`
