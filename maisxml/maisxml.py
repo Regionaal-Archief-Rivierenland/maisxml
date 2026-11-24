@@ -10,17 +10,23 @@ def _datum_gronings() -> str:
     return datetime.now().strftime("%d-%m-%Y %H-%M %S")
 
 
-def new_awe(veldnaam: str, veldprompt: str, veldwaarde: str) -> ET.Element:
-    """Create a new `<AWE>`."""
+def new_awe(naam: str, prompt: str, waarde: str) -> ET.Element:
+    """Maak een nieuwe `<AWE>` ("flexveld")
+
+    Args:
+        - naam: de naam van het flexveld/de waarde van <NAAM>
+        - prompt: de prompt van het flexveld
+        - waarde: de waarde om in het flexveld te vullen
+    """
     awe = ET.Element("AWE")
     naam = ET.SubElement(awe, "NAAM")
     prompt = ET.SubElement(awe, "PROMPT")
     waarde = ET.SubElement(awe, "WAARDE")
 
-    awe.text, awe.tail = "\n", "\n"  # we \r\n this later
-    naam.text, naam.tail = veldnaam, "\n"
-    prompt.text, prompt.tail = veldprompt, "\n"
-    waarde.text, waarde.tail = veldwaarde, "\n"
+    awe.text, awe.tail = "\n", "\n"
+    naam.text, naam.tail = naam, "\n"
+    prompt.text, prompt.tail = prompt, "\n"
+    waarde.text, waarde.tail = waarde, "\n"
     return awe
 
 
