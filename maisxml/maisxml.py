@@ -106,12 +106,12 @@ def touch_datemutated(ahd: ET.Element, by_user: str = "RAR_ARA"):
     _replace_or_add_awe(ahd, "USERMUTATED", "Gewijzigd door", by_user)
     _replace_or_add_awe(ahd, "DATEMUTATED", "Gewijzigd op", datum_gronings())
 
-
 def extract_toegangscode(file: Path | str) -> str:
-    # ignore everything but AHDs, and yield the first one after its been parsed
-    _, top_ahd = next(ET.iterparse(file, tag="AHD"))
-    return top_ahd.findtext("CODE")
-
+    with open(file) as f:
+        # lets assume the first 10 lines always hold the <CODE>, somewhere
+        for l in islice(f, 10):
+            if m := re.match(r"<CODE>(<!\[CDATA\[)?(.*?)(\]\]\>)?</CODE>", l):
+                return m.group(2)
 
 def maisxml_has_been_fixed(file: Path | str) -> bool:
     """Check if `fixmaisxml` has been run on `file`."""
