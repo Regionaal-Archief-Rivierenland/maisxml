@@ -4,6 +4,8 @@ from pathlib import Path
 from uuid import uuid4
 from datetime import datetime
 
+import re
+from itertools import islice
 
 def datum_gronings() -> str:
     """Huidig datum, op z'n Gronings geformateerd"""
